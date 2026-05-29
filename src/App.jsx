@@ -637,8 +637,7 @@ export default function App() {
         );
       
         const overlapKey =
-`${String(endDateValue).trim()}|
-${String(currentSection).trim().toUpperCase()}|
+`${String(currentSection).trim().toUpperCase()}|
 ${String(flightNumber).replace(/\s+/g,'').toUpperCase()}|
 ${String(regn).trim().toUpperCase()}|
 ${String(bayNumber).trim()}`;      
@@ -773,7 +772,12 @@ ${endTime}
 
       overlapMap.forEach(
         (records) => {
-      
+          records = records.filter(
+            r =>
+              r.start instanceof Date &&
+              r.end instanceof Date
+          );
+
           records.sort(
             (a, b) =>
               a.start - b.start
@@ -1102,88 +1106,7 @@ ${endTime}
 
       </table>
 
-      {/* DUPLICATE CHECKER */}
-
-      <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '10px',
-        }}
-      >
-        Repitition Checker
-      </h2>
-
-      <p
-        style={{
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        (End Date, Flight Number,
-        REGN, Bay Number,
-        Start Time, End Time)
-      </p>
-
-      <table
-        border="1"
-        cellPadding="10"
-        style={{
-          width: '100%',
-          marginBottom: '50px',
-          borderCollapse: 'collapse',
-          color: 'white',
-        }}
-      >
-
-        <thead
-          style={{
-            backgroundColor: '#dc2626',
-          }}
-        >
-
-          <tr>
-            <th>Rows</th>
-            <th>Type</th>
-            <th>Flight</th>
-            <th>REGN</th>
-            <th>Bay</th>
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {duplicates.length > 0 ? (
-
-            duplicates.map((item, idx) => (
-
-              <tr key={idx}>
-
-                <td>{item.rows}</td>
-                <td>{item.type}</td>
-                <td>{item.flightNumber}</td>
-                <td>{item.regn}</td>
-                <td>{item.bayNumber}</td>
-
-              </tr>
-
-            ))
-
-          ) : (
-
-            <tr>
-
-              <td colSpan="5">
-                No duplicate entries found
-              </td>
-
-            </tr>
-
-          )}
-
-        </tbody>
-
-      </table>
+     
 
       {/* CHARGE CHECKER */}
 
