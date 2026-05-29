@@ -12,6 +12,7 @@ export default function App() {
   const [chargeErrors, setChargeErrors] = useState([]);
   const [abnormalEntries, setAbnormalEntries] = useState([]);
   const [delEntries, setDelEntries] = useState([]);
+  const [overlaps, setOverlaps] = useState([]);
 
   const [gpuRate, setGpuRate] = useState('');
   const [pcaRate, setPcaRate] = useState('');
@@ -65,10 +66,155 @@ export default function App() {
     return Math.ceil(value);
 
   };
+  const excelDateToJSDate = (value) => {
 
+    if (value instanceof Date) {
+      return value;
+    }
+  
+    if (typeof value === 'number') {
+  
+      return new Date(
+        Math.round(
+          (value - 25569) *
+          86400 * 1000
+        )
+      );
+  
+    }
+  
+    return new Date(value);
+  
+  };
+  
+  const getTimeParts = (value) => {
+  
+    if (typeof value === 'number') {
+  
+      const totalMinutes =
+        Math.round(
+          value * 24 * 60
+        );
+  
+      return {
+        hour:
+          Math.floor(
+            totalMinutes / 60
+          ),
+        minute:
+          totalMinutes % 60
+      };
+  
+    }
+  
+    const parts =
+      String(value)
+        .trim()
+        .split(':');
+  
+    return {
+      hour:
+        Number(parts[0]),
+      minute:
+        Number(parts[1])
+    };
+  
+  };
+  
+  const buildInterval = (
+    endDate,
+    startTime,
+    endTime
+  ) => {
+  
+    const endDateObj =
+      excelDateToJSDate(
+        endDate
+      );
+  
+    const startDateObj =
+      new Date(endDateObj);
+  
+    const startParts =
+      getTimeParts(
+        startTime
+      );
+  
+    const endParts =
+      getTimeParts(
+        endTime
+      );
+  
+    const startMinutes =
+      startParts.hour * 60 +
+      startParts.minute;
+  
+    const endMinutes =
+      endParts.hour * 60 +
+      endParts.minute;
+  
+    if (
+      endMinutes <
+      startMinutes
+    ) {
+  
+      startDateObj.setDate(
+        startDateObj.getDate() - 1
+      );
+  
+    }
+  
+    const startDateTime =
+      new Date(startDateObj);
+  
+    startDateTime.setHours(
+      startParts.hour,
+      startParts.minute,
+      0,
+      0
+    );
+  
+    const endDateTime =
+      new Date(endDateObj);
+  
+    endDateTime.setHours(
+      endParts.hour,
+      endParts.minute,
+      0,
+      0
+    );
+  
+    return {
+      startDateTime,
+      endDateTime
+    };
+  
+  };
+  const formatTime = (value) => {
+
+    if (typeof value === 'number') {
+  
+      const totalMinutes =
+        Math.round(value * 24 * 60);
+  
+      const hours =
+        Math.floor(totalMinutes / 60);
+  
+      const minutes =
+        totalMinutes % 60;
+  
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  
+    }
+  
+    return String(value);
+  
+  };
+  
   // =========================
   // FILE UPLOAD
   // =========================
+  
 
   const handleUpload = (e) => {
 
@@ -202,6 +348,7 @@ export default function App() {
       let chargeMismatchRows = [];
       let abnormalUsageRows = [];
       let delRows = [];
+      let overlapRows = [];
 
       // =========================
       // MAPS
@@ -209,6 +356,7 @@ export default function App() {
 
       const gpuFlightSet = new Map();
       const pcaFlightSet = new Map();
+      const overlapMap = new Map();
 
       // =========================
       // SECTION TRACKER
@@ -457,11 +605,89 @@ export default function App() {
         const flightNumber =
           row[flightIndex];
 
-        const regn =
+          const regn =
           row[regnIndex];
-
+        
         const bayNumber =
           row[bayIndex];
+        
+        const startTimeValue =
+          row[startTimeIndex];
+      
+      const endTimeValue =
+        row[endTimeIndex];
+      
+      const endDateValue =
+        row[endDateIndex];
+      
+      if (
+        startTimeValue &&
+        endTimeValue &&
+        endDateValue &&
+        flightNumber &&
+        regn &&
+        bayNumber
+      ) {
+      
+        const {
+          startDateTime,
+          endDateTime
+        } = buildInterval(
+          endDateValue,
+          startTimeValue,
+          endTimeValue
+        );
+      
+        const overlapKey =
+`${String(endDateValue).trim()}|
+${String(currentSection).trim().toUpperCase()}|
+${String(flightNumber).replace(/\s+/g,'').toUpperCase()}|
+${String(regn).trim().toUpperCase()}|
+${String(bayNumber).trim()}`;      
+        if (
+          !overlapMap.has(
+            overlapKey
+          )
+        ) {
+      
+          overlapMap.set(
+            overlapKey,
+            []
+          );
+      
+        }
+      
+        overlapMap
+          .get(overlapKey)
+          .push({
+      
+            row:
+              index + 1,
+      
+            start:
+              startDateTime,
+      
+            end:
+              endDateTime,
+      
+            type:
+              currentSection,
+      
+            flight:
+              flightNumber,
+      
+            regn,
+      
+            bay:
+              bayNumber,
+      
+            range:
+`${formatTime(startTimeValue)} - ${formatTime(endTimeValue)}`
+      
+          });
+      
+      }
+        
 
         const startTime =
           row[startTimeIndex];
@@ -547,6 +773,76 @@ ${endTime}
 
       });
 
+      overlapMap.forEach(
+        (records) => {
+      
+          records.sort(
+            (a, b) =>
+              a.start - b.start
+          );
+      
+          for (
+            let i = 0;
+            i < records.length;
+            i++
+          ) {
+      
+            for (
+              let j = i + 1;
+              j < records.length;
+              j++
+            ) {
+      
+              const a =
+                records[i];
+      
+              const b =
+                records[j];
+      
+                if (
+                  a.start < b.end &&
+                  b.start < a.end
+                ) {
+      
+                overlapRows.push({
+      
+                  row1:
+                    a.row,
+      
+                  row2:
+                    b.row,
+      
+                  type:
+                    a.type,
+      
+                  flight:
+                    a.flight,
+      
+                  regn:
+                    a.regn,
+      
+                  bay:
+                    a.bay,
+      
+                  range1:
+                    a.range,
+      
+                  range2:
+                    b.range,
+      
+                });
+      
+              }
+      
+            }
+      
+          }
+      
+        }
+      );
+      
+
+
       // =========================
       // SAVE
       // =========================
@@ -566,6 +862,9 @@ ${endTime}
       );
 
       setDelEntries(delRows);
+      setOverlaps(
+        overlapRows
+      );
 
     };
 
@@ -813,9 +1112,9 @@ ${endTime}
           <tr>
             <th>Row</th>
             <th>Type</th>
-            <th>Actual</th>
-            <th>Billed</th>
-            <th>Expected</th>
+            <th>Actual Usage</th>
+            <th>Billed Usage</th>
+            <th>Expected Usage</th>
           </tr>
 
         </thead>
@@ -1148,6 +1447,86 @@ ${endTime}
         </tbody>
 
       </table>
+
+      <h2
+  style={{
+    textAlign: 'center',
+    marginBottom: '20px',
+  }}
+>
+  Overlap Usage Checker
+</h2>
+
+<table
+  border="1"
+  cellPadding="10"
+  style={{
+    width: '100%',
+    marginBottom: '50px',
+    borderCollapse: 'collapse',
+    color: 'white',
+  }}
+>
+
+  <thead
+    style={{
+      backgroundColor: '#7c3aed',
+    }}
+  >
+
+    <tr>
+
+      <th>Row 1</th>
+      <th>Row 2</th>
+      <th>Type</th>
+      <th>Flight</th>
+      <th>REGN</th>
+      <th>Bay</th>
+      <th>Time Range 1</th>
+      <th>Time Range 2</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    {overlaps.length > 0 ? (
+
+      overlaps.map(
+        (item, idx) => (
+
+          <tr key={idx}>
+
+            <td>{item.row1}</td>
+            <td>{item.row2}</td>
+            <td>{item.type}</td>
+            <td>{item.flight}</td>
+            <td>{item.regn}</td>
+            <td>{item.bay}</td>
+            <td>{item.range1}</td>
+            <td>{item.range2}</td>
+
+          </tr>
+
+        )
+      )
+
+    ) : (
+
+      <tr>
+
+        <td colSpan="8">
+          No overlapping usage found
+        </td>
+
+      </tr>
+
+    )}
+
+  </tbody>
+
+</table>
 
     </div>
 
