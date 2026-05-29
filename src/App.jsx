@@ -1326,7 +1326,7 @@ ${endTime}
     marginBottom: '20px',
   }}
 >
-  Overlap Usage Checker
+  Overlap Usage and Repitition Checker
 </h2>
 
 <table
