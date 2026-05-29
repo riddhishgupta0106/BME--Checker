@@ -14,8 +14,8 @@ export default function App() {
   const [delEntries, setDelEntries] = useState([]);
   const [overlaps, setOverlaps] = useState([]);
 
-  const [gpuRate, setGpuRate] = useState('');
-  const [pcaRate, setPcaRate] = useState('');
+  const gpuRate = 2200;
+  const pcaRate = 3300;
 
   const [abnormalHours, setAbnormalHours] = useState('');
   const [abnormalMinutes, setAbnormalMinutes] = useState('');
@@ -538,15 +538,13 @@ export default function App() {
             currentSection === 'GPU'
           ) {
 
-            hourlyRate =
-              Number(gpuRate);
+            hourlyRate =2200;
 
           } else if (
             currentSection === 'PCA'
           ) {
 
-            hourlyRate =
-              Number(pcaRate);
+            hourlyRate =3300;
 
           }
 
@@ -952,67 +950,18 @@ ${endTime}
 
       </div>
 
-      {/* RATES */}
-
       <div
-        style={{
-          display: 'flex',
-          gap: '40px',
-          marginBottom: '30px',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-
-        <div
-          style={{
-            textAlign: 'center',
-          }}
-        >
-
-          <label>
-            GPU Rate/Hour
-          </label>
-
-          <br />
-
-          <input
-            type="number"
-            value={gpuRate}
-            onChange={(e) =>
-              setGpuRate(
-                e.target.value
-              )
-            }
-          />
-
-        </div>
-
-        <div
-          style={{
-            textAlign: 'center',
-          }}
-        >
-
-          <label>
-            PCA Rate/Hour
-          </label>
-
-          <br />
-
-          <input
-            type="number"
-            value={pcaRate}
-            onChange={(e) =>
-              setPcaRate(
-                e.target.value
-              )
-            }
-          />
-
-        </div>
-
-      </div>
+  style={{
+    textAlign: 'center',
+    marginBottom: '30px',
+    fontSize: '18px',
+    fontWeight: 'bold',
+    color: '#60a5fa',
+  }}
+>
+  Fixed Billing Rates: GPU ₹2200/hour | PCA ₹3300/hour
+</div>
+      
 
       {/* ABNORMAL */}
 
