@@ -1,8 +1,8 @@
 {
   "name": "excel_checker",
   "private": true,
+  "homepage": "https://riddhishgupta0106.github.io/BME--Checker",
   "version": "0.0.0",
-  "homepage": "https://riddhishgupta0106.github.io/bme-checker",
   "type": "module",
   "scripts": {
     "dev": "vite",
