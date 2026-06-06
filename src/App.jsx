@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx-js-style';
 
 export default function App() {
 
@@ -13,6 +13,11 @@ export default function App() {
   const [abnormalEntries, setAbnormalEntries] = useState([]);
   const [delEntries, setDelEntries] = useState([]);
   const [overlaps, setOverlaps] = useState([]);
+  const [uploadedWorkbook, setUploadedWorkbook] =
+  useState(null);
+
+const [uploadedSheetName, setUploadedSheetName] =
+  useState('');
 
   const gpuRate = 2200;
   const pcaRate = 3300;
@@ -235,6 +240,11 @@ export default function App() {
         XLSX.read(data, {
           type: 'array',
         });
+        setUploadedWorkbook(workbook);
+
+setUploadedSheetName(
+  workbook.SheetNames[0]
+);
 
       const sheetName =
         workbook.SheetNames[0];
@@ -873,7 +883,181 @@ ${endTime}
     reader.readAsArrayBuffer(file);
 
   };
+  const downloadHighlightedExcel = () => {
 
+    if (!uploadedWorkbook) {
+      alert("Please upload a file first");
+      return;
+    }
+  
+    const workbook =
+      XLSX.utils.book_new();
+  
+    const worksheet =
+      uploadedWorkbook.Sheets[
+        uploadedSheetName
+      ];
+  
+    const overlapRows =
+      new Set();
+  
+    const roundingRows =
+      new Set();
+  
+    const chargeRows =
+      new Set();
+  
+    const abnormalRows =
+      new Set();
+  
+    const delRowsSet =
+      new Set();
+  
+    overlaps.forEach(item => {
+  
+      overlapRows.add(item.row1);
+      overlapRows.add(item.row2);
+  
+    });
+  
+    results.forEach(item => {
+  
+      roundingRows.add(item.row);
+  
+    });
+  
+    chargeErrors.forEach(item => {
+  
+      chargeRows.add(item.row);
+  
+    });
+  
+    abnormalEntries.forEach(item => {
+  
+      abnormalRows.add(item.row);
+  
+    });
+  
+    delEntries.forEach(item => {
+  
+      delRowsSet.add(item.row);
+  
+    });
+  
+    const range =
+      XLSX.utils.decode_range(
+        worksheet['!ref']
+      );
+  
+    for (
+      let row = 0;
+      row <= range.e.r;
+      row++
+    ) {
+  
+      const excelRow =
+        row + 1;
+  
+      let color = null;
+  
+      if (
+        overlapRows.has(
+          excelRow
+        )
+      ) {
+  
+        color = "FFFF00";
+  
+      }
+  
+      else if (
+        roundingRows.has(
+          excelRow
+        )
+      ) {
+  
+        color = "FFA500";
+  
+      }
+  
+      else if (
+        chargeRows.has(
+          excelRow
+        )
+      ) {
+  
+        color = "FF9999";
+  
+      }
+  
+      else if (
+        abnormalRows.has(
+          excelRow
+        )
+      ) {
+  
+        color = "C084FC";
+  
+      }
+  
+      else if (
+        delRowsSet.has(
+          excelRow
+        )
+      ) {
+  
+        color = "93C5FD";
+  
+      }
+  
+      if (!color) continue;
+  
+      for (
+        let col = range.s.c;
+        col <= range.e.c;
+        col++
+      ) {
+  
+        const cellAddress =
+          XLSX.utils.encode_cell({
+            r: row,
+            c: col
+          });
+  
+        if (
+          worksheet[cellAddress]
+        ) {
+  
+          worksheet[cellAddress].s = {
+  
+            fill: {
+  
+              fgColor: {
+                rgb: color
+              }
+  
+            }
+  
+          };
+  
+        }
+  
+      }
+  
+    }
+  
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      uploadedSheetName
+    );
+  
+    XLSX.writeFile(
+      workbook,
+      "BME_Highlighted_Report.xlsx"
+    );
+  
+  };
   // =========================
   // UI
   // =========================
@@ -1028,11 +1212,36 @@ ${endTime}
 
         <input
           type="file"
+          
           accept=".xlsx,.xls"
           onChange={handleUpload}
         />
 
       </div>
+      <div
+  style={{
+    textAlign: 'center',
+    marginBottom: '40px',
+  }}
+>
+
+  <button
+    onClick={downloadHighlightedExcel}
+    style={{
+      padding: '12px 24px',
+      backgroundColor: '#2563eb',
+      color: 'white',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontWeight: 'bold',
+      fontSize: '16px',
+    }}
+  >
+    Download Highlighted Excel
+  </button>
+
+</div>
 
       {/* ROUND OFF CHECKER */}
 
@@ -1326,7 +1535,7 @@ ${endTime}
     marginBottom: '20px',
   }}
 >
-  Overlap Usage and Repitition Checker
+  Overlap Usage
 </h2>
 
 <table
