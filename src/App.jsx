@@ -1074,13 +1074,14 @@ ${endTime}
       }}
     >
 
-      <h1
-        style={{
-          textAlign: 'center',
-          marginBottom: '20px',
-          fontSize: '42px',
-        }}
-      >
+<h1
+  style={{
+    textAlign: 'center',
+    marginBottom: '20px',
+    fontSize: '42px',
+    color: 'white',
+  }}
+>
         BME Excel Checker
       </h1>
 
@@ -1144,7 +1145,7 @@ ${endTime}
     marginBottom: '30px',
     fontSize: '18px',
     fontWeight: 'bold',
-    color: '#60a5fa',
+    color: 'white',
   }}
 >
   Fixed Billing Rates: GPU ₹2200/hour | PCA ₹3300/hour
@@ -1159,11 +1160,12 @@ ${endTime}
         }}
       >
 
-        <h3
-          style={{
-            textAlign: 'center',
-          }}
-        >
+<h3
+  style={{
+    textAlign: 'center',
+    color: 'white',
+  }}
+>
           Minimum Abnormal Usage
         </h3>
 
@@ -1297,11 +1299,12 @@ ${endTime}
       {/* ROUND OFF CHECKER */}
 
       <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
+  style={{
+    textAlign: 'center',
+    marginBottom: '20px',
+    color: 'white',
+  }}
+>
         Round Off Checker
       </h2>
 
@@ -1371,13 +1374,14 @@ ${endTime}
       {/* CHARGE CHECKER */}
 
       <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        Charges Checker
-      </h2>
+  style={{
+    textAlign: 'center',
+    marginBottom: '20px',
+    color: 'white',
+  }}
+>
+  Charges Checker
+</h2>
 
       <table
         border="1"
@@ -1441,13 +1445,14 @@ ${endTime}
       {/* ABNORMAL */}
 
       <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        Abnormal Usage Checker
-      </h2>
+  style={{
+    textAlign: 'center',
+    marginBottom: '20px',
+    color: 'white',
+  }}
+>
+  Abnormal Usage Checker
+</h2>
 
       <table
         border="1"
@@ -1509,13 +1514,14 @@ ${endTime}
       {/* DEL CHECKER */}
 
       <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        DEL Checker
-      </h2>
+  style={{
+    textAlign: 'center',
+    marginBottom: '20px',
+    color: 'white',
+  }}
+>
+  DEL Checker
+</h2>
 
       <table
         border="1"
@@ -1584,6 +1590,7 @@ ${endTime}
   style={{
     textAlign: 'center',
     marginBottom: '20px',
+    color: 'white',
   }}
 >
   Overlap Usage
