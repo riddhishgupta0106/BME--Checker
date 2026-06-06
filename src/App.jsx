@@ -1242,6 +1242,57 @@ ${endTime}
   </button>
 
 </div>
+<div
+  style={{
+    maxWidth: '700px',
+    margin: '0 auto 40px auto',
+    padding: '15px',
+    border: '1px solid #444',
+    borderRadius: '8px',
+    backgroundColor: '#111827',
+  }}
+>
+
+  <h3
+    style={{
+      textAlign: 'center',
+      marginBottom: '15px',
+      color: 'white',
+    }}
+  >
+    Highlighted Excel Color Legend
+  </h3>
+
+  <div style={{ color: 'white' }}>
+
+    <p>
+      🟨 <strong>Yellow</strong> →
+      Overlap Usage
+    </p>
+
+    <p>
+      🟧 <strong>Orange</strong> →
+      Round Off Mismatch
+    </p>
+
+    <p>
+      🟥 <strong>Red</strong> →
+      Charge Mismatch
+    </p>
+
+    <p>
+      🟪 <strong>Purple</strong> →
+      Abnormal Usage
+    </p>
+
+    <p>
+      🟦 <strong>Blue</strong> →
+      DEL Flight
+    </p>
+
+  </div>
+
+</div>
 
       {/* ROUND OFF CHECKER */}
 
